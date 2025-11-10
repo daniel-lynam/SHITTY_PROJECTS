@@ -1,0 +1,98 @@
+import pygame
+import math
+
+pygame.init()
+SCREEN_WIDTH = 1080
+SCREEN_HEIGHT = 1080
+HALF_SCREEN_WIDTH = SCREEN_WIDTH//2
+HALF_SCREEN_HEIGHT = SCREEN_HEIGHT//2
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("3d projection")
+
+
+def display():
+    screen.fill((0, 0, 0))
+
+def getang_up(x,z):
+
+    return math.atan2(x-X,z-Z)
+
+def getang_side(y,z):
+
+    return math.atan2(y-Y,z-Z)
+
+fov_up = 60
+fov_side = 60
+
+fov_up_r = math.radians(120)
+fov_side_r = math.radians(120)
+X, Y, Z = -0, -0, -7
+current_ang_up = 0
+current_ang_side = 0
+
+class vertex:
+    def __init__(self, pos):
+        self.x,self.y,self.z = pos
+
+
+
+vertexs = []
+
+
+cube_verts = [(-1, -1, 2),(-1, -1, 4),(1, -1, 2),(1, -1, 4),(-1, 1, 2),(-1, 1, 4),(1, 1, 2),(1, 1, 4)]
+
+
+
+
+d20_verts = [(0, 1, 1.6180339887),(1, 1.6180339887, 0),(1.6180339887, 0, 1),
+             (0, 1, -1.6180339887),(1, -1.6180339887, 0),(1.6180339887, 0, -1),
+             (0, -1, 1.6180339887),(-1, 1.6180339887, 0),(-1.6180339887, 0, 1),
+             (0, -1, -1.6180339887),(-1, -1.6180339887, 0),(-1.6180339887, 0, -1)
+             ]
+
+
+
+for i in cube_verts:
+    vertexs.append(vertex(i))
+
+
+
+
+
+
+midpoint = (0,0,0)
+
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_s]:
+        Z-=0.01
+    if keys[pygame.K_w]:
+        Z+=0.01
+    if keys[pygame.K_a]:
+        Y-=0.01
+    if keys[pygame.K_d]:
+        Y+=0.01
+    if keys[pygame.K_SPACE]:
+        X -= 0.01
+    if keys[pygame.K_LSHIFT]:
+        X += 0.01
+
+    screen.fill((0,0,0))
+    vertangs = []
+    for i in vertexs:
+        vertangs.append((
+                         HALF_SCREEN_WIDTH+math.degrees(getang_side(i.x, i.z))*SCREEN_WIDTH/fov_side,
+                         HALF_SCREEN_HEIGHT+(math.degrees(getang_up(i.y, i.z)))*SCREEN_HEIGHT/fov_up))
+    for i in vertangs:
+        pygame.draw.circle(screen,(255,100,100),(i),4)
+    for i in vertangs:
+        for j in vertangs:
+            pygame.draw.line(screen,(133,133,133),i,j,1)
+
+    pygame.display.flip()
